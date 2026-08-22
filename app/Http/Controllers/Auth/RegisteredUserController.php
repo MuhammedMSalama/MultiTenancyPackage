@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
@@ -30,16 +31,26 @@ class RegisteredUserController extends Controller
      */
     public function store(Request $request): RedirectResponse
     {
-        $request->validate([
+        // Update Register Functionality | Tenant
+        $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
+            'tenant' => ['required', 'string', 'max:255', 'unique:tenants,name'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
+
+        // dd($data);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+        ]);
+
+        // Update Register Functionality | Tenant
+        $tenant = Tenant::create([
+            'name' => $data['tenant'],
+            'user_id' => $user->id
         ]);
 
         event(new Registered($user));

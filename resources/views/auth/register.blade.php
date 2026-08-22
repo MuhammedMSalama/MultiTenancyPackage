@@ -16,6 +16,17 @@
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
 
+{{--        // Update Register Functionality | Tenant--}}
+{{--////////////////////////////////////////////////////////--}}
+        <!-- Tenant -->
+        <div class="mt-4">
+            <x-input-label for="tenant" :value="__('Tenant')" />
+            <x-text-input id="tenant" class="block mt-1 w-full" type="text" name="tenant" :value="old('tenant')" required autocomplete="username" />
+            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+        </div>
+
+{{-- //////////////////////////////////////////////////////////////////// --}}
+
         <!-- Password -->
         <div class="mt-4">
             <x-input-label for="password" :value="__('Password')" />
