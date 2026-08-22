@@ -49,8 +49,15 @@ class RegisteredUserController extends Controller
 
         // Update Register Functionality | Tenant
         $tenant = Tenant::create([
+            // 'tenancy_db_name' => 'tenant_' . $data['tenant'],
+            'id' => $data['tenant'],
             'name' => $data['tenant'],
             'user_id' => $user->id
+        ]);
+
+        // Tenant Domains
+        $tenant->domains()->create([
+            'domain' => $data['tenant'],
         ]);
 
         event(new Registered($user));
