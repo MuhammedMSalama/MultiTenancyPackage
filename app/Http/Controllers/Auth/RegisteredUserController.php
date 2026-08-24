@@ -34,12 +34,10 @@ class RegisteredUserController extends Controller
         // Update Register Functionality | Tenant
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'tenant' => ['required', 'string', 'max:255', 'unique:tenants,name'],
+            'tenant' => ['sometimes', 'required', 'string', 'max:255', 'unique:tenants,name'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
-
-        // dd($data);
 
         $user = User::create([
             'name' => $request->name,
@@ -48,14 +46,27 @@ class RegisteredUserController extends Controller
         ]);
 
         // Update Register Functionality | Tenant
-        $tenant = Tenant::create([
-            'name' => $data['tenant'],
-            'user_id' => $user->id
-        ]);
+        if ($request->has('tenant')) {
+            // Update Register Functionality | Tenant
+            $tenant = Tenant::create([
+                'id' => $data['tenant'],
+                'name' => $data['tenant'],
+                'user_id' => $user->id,
+            ]);
+
+            // Tenant Domains
+            $tenant->domains()->create([
+                'domain' => $data['tenant'],
+            ]);
+        }
 
         event(new Registered($user));
 
         Auth::login($user);
+
+        if (isset($tenant)) {
+            return redirect('http://' . $data['tenant'] . '.teams.test/login');
+        }
 
         return redirect(route('dashboard', absolute: false));
     }
